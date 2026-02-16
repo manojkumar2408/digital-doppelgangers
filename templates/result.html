@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prediction Result</title>
+
+    <!-- particles -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: url("https://images.unsplash.com/photo-1504384308090-c894fdcc538d") no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            text-align: center;
+        }
+
+        .overlay {
+            background: linear-gradient(rgba(10,20,40,0.85), rgba(0,80,150,0.7));
+            min-height: 100vh;
+            position: relative;
+        }
+
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        header {
+            position: relative;
+            z-index: 1;
+            padding: 15px;
+            background: rgba(0,0,0,0.35);
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo {
+            width: 45px;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+        .card {
+            position: relative;
+            z-index: 1;
+            display: inline-block;
+            margin-top: 70px;
+            padding: 40px;
+            border-radius: 15px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 0 25px rgba(0,0,0,0.5);
+        }
+
+        .status {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .real {
+            color: #00ff9f;
+        }
+
+        .fake {
+            color: #ff4b5c;
+        }
+
+        .confidence {
+            margin-top: 10px;
+            font-size: 18px;
+        }
+
+        .bar {
+            width: 100%;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .progress {
+            height: 18px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #00ff9f, #00c6ff);
+        }
+
+        img {
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.6);
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 25px;
+            border-radius: 8px;
+            background: linear-gradient(45deg, #00c6ff, #0072ff);
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        footer {
+            position: relative;
+            z-index: 1;
+            margin-top: 40px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="overlay">
+<div id="particles-js"></div>
+
+<header>
+    <!-- same inline logo -->
+    <svg class="logo" viewBox="0 0 64 64" fill="#00c6ff">
+        <circle cx="32" cy="32" r="30" stroke="#00c6ff" stroke-width="3" fill="none"/>
+        <path d="M20 40 L32 20 L44 40 Z" fill="#00c6ff"/>
+    </svg>
+    Prediction Result
+</header>
+
+<div class="card">
+
+    {% if prediction == "Real" %}
+        <div class="status real">✔ REAL IMAGE</div>
+    {% else %}
+        <div class="status fake">⚠ FAKE IMAGE</div>
+    {% endif %}
+
+    <div class="confidence">Confidence: {{ confidence }}%</div>
+
+    <div class="bar">
+        <div class="progress" style="width: {{ confidence }}%"></div>
+    </div>
+
+    <img src="{{ url_for('static', filename='uploads/' + filename) }}" width="320">
+
+    <br>
+    <a href="/" class="btn">Analyze Another Image</a>
+
+</div>
+
+<footer>
+Digital Doppelgangers • AI Detection System
+</footer>
+
+</div>
+
+<script>
+particlesJS("particles-js", {
+  particles: {
+    number: { value: 60 },
+    size: { value: 3 },
+    move: { speed: 1.2 },
+    line_linked: { enable: true },
+    color: { value: "#00c6ff" }
+  }
+});
+</script>
+
+</body>
+</html>

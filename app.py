@@ -4,55 +4,50 @@ from flask import Flask, render_template, request
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 
-# -------------------------------
-# App configuration
-# -------------------------------
 app = Flask(__name__)
 
-UPLOAD_FOLDER = "static/uploads"
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+# =========================
+# Load Model Safely
+# =========================
+MODEL_PATH = "model.h5"
 
-# Create upload folder if not exists
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+model = None
+if os.path.exists(MODEL_PATH):
+    try:
+        model = load_model(MODEL_PATH)
+        print("✅ Model loaded successfully")
+    except Exception as e:
+        print("❌ Error loading model:", e)
+else:
+    print("❌ model.h5 not found")
 
-# -------------------------------
-# Load trained model
-# -------------------------------
-MODEL_PATH = "model.h5"   # change if your model name differs
-model = load_model(MODEL_PATH)
-
-IMG_SIZE = (224, 224)  # change if your model uses different size
-
-
-# -------------------------------
-# Home page
-# -------------------------------
+# =========================
+# Home Route
+# =========================
 @app.route("/")
 def index():
     return render_template("index.html")
 
-
-# -------------------------------
-# Prediction route
-# -------------------------------
+# =========================
+# Prediction Route
+# =========================
 @app.route("/predict", methods=["POST"])
 def predict():
-    if "file" not in request.files:
-        return render_template("result.html", result="No file uploaded")
+    if model is None:
+        return "Model not loaded. Check model.h5"
 
     file = request.files["file"]
 
     if file.filename == "":
-        return render_template("result.html", result="No file selected")
+        return "No file selected"
 
-    filepath = os.path.join(app.config["UPLOAD_FOLDER"], file.filename)
+    filepath = os.path.join("static", file.filename)
     file.save(filepath)
 
-    # Preprocess image
-    img = image.load_img(filepath, target_size=IMG_SIZE)
+    # Preprocess Image
+    img = image.load_img(filepath, target_size=(224, 224))
     img_array = image.img_to_array(img)
-    img_array = np.expand_dims(img_array, axis=0)
-    img_array = img_array / 255.0
+    img_array = np.expand_dims(img_array, axis=0) / 255.0
 
     # Prediction
     prediction = model.predict(img_array)[0][0]
@@ -71,10 +66,9 @@ def predict():
         image_path=filepath
     )
 
-
-# -------------------------------
-# Run app (for local testing)
-# -------------------------------
+# =========================
+# Run App (Render Compatible)
+# =========================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app.run(host="0.0.0.0", port=port)
